@@ -31,16 +31,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    // Check if user is logged in on app start
-    const token = localStorage.getItem("token")
-    const userData = localStorage.getItem("user")
-
-    if (token && userData) {
-      setUser(JSON.parse(userData))
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const res = await fetch("/api/auth/me", {
+        credentials: "include",
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setUser(data.user)
+      }
+    } catch (err) {
+      console.error("Not authenticated")
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
-  }, [])
+  }
+
+  fetchUser()
+}, [])
+
 
   const login = async (email: string, password: string) => {
     try {
@@ -50,42 +60,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       })
 
-      if (!response.ok) {
-        // Mock authentication for demo purposes
-        let mockUser: User
-        if (email === "receptionist@hospital.com" && password === "password") {
-          mockUser = {
-            id: "1",
-            email: "receptionist@hospital.com",
-            role: "receptionist",
-            name: "Jane Smith",
-          }
-        } else if (email === "doctor@hospital.com" && password === "password") {
-          mockUser = {
-            id: "2",
-            email: "doctor@hospital.com",
-            role: "doctor",
-            name: "Dr. John Doe",
-          }
-        } else {
-          throw new Error("Invalid credentials")
-        }
-
-        localStorage.setItem("token", "mock-jwt-token")
-        localStorage.setItem("user", JSON.stringify(mockUser))
-        setUser(mockUser)
-        return
-      }
-
+      
       const data = await response.json()
-      localStorage.setItem("token", data.token)
-      localStorage.setItem("user", JSON.stringify(data.user))
+      if(!response.ok){
+        throw Error
+      }
       setUser(data.user)
     } catch (error) {
-      throw error
+      throw new Error("Invalid credentials")
+      // throw error
     }
   }
 

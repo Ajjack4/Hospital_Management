@@ -34,6 +34,35 @@ const PatientList: React.FC<PatientListProps> = ({
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString()
   }
+  function formatPostgresDateSafe(postgresDateString : string) {
+  if (!postgresDateString) {
+    return 'No date';
+  }
+  
+  try {
+    // Normalize PostgreSQL timestamp format
+    let dateString = postgresDateString.toString().replace(' ', 'T');
+    
+    // Handle timezone: +00 -> Z
+    if (dateString.endsWith('+00')) {
+      dateString = dateString.slice(0, -3) + 'Z';
+    }
+    
+    const date = new Date(dateString);
+    
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
+    
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    return 'Invalid Date';
+  }
+}
 
   const calculateAge = (dateOfBirth: string) => {
     const today = new Date()
@@ -121,7 +150,7 @@ const PatientList: React.FC<PatientListProps> = ({
                     <div className="text-sm text-gray-500">DOB: {formatDate(patient.dateOfBirth)}</div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(patient.createdAt)}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatPostgresDateSafe(patient.createdAt)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">
                     <button

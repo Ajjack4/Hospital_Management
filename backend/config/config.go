@@ -39,7 +39,7 @@ func ConnectDatabase() {
 	// ✅ Migrate models here
 	if err := db.AutoMigrate(
 		&models.User{},
-		// add other models like &models.Patient{} here
+		&models.Patient{},
 	); err != nil {
 		log.Fatal("❌ Migration failed:", err)
 	}

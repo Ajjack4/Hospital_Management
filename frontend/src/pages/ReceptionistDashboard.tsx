@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useAuth } from "../contexts/AuthContext"
 import PatientForm from "../components/PatientForm"
@@ -21,37 +19,34 @@ const ReceptionistDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      // Mock API call - replace with actual endpoint
-      const mockPatients: Patient[] = [
-        {
-          id: "1",
-          name: "John Smith",
-          email: "john.smith@email.com",
-          phone: "+1234567890",
-          dateOfBirth: "1990-05-15",
-          gender: "male",
-          address: "123 Main St, City, State 12345",
-          emergencyContact: "Jane Smith - +1234567891",
-          medicalHistory: "No known allergies",
-          createdAt: "2024-01-15T10:30:00Z",
-          updatedAt: "2024-01-15T10:30:00Z",
+      const response = await fetch('/api/patients', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          id: "2",
-          name: "Sarah Johnson",
-          email: "sarah.johnson@email.com",
-          phone: "+1234567892",
-          dateOfBirth: "1985-08-22",
-          gender: "female",
-          address: "456 Oak Ave, City, State 12345",
-          emergencyContact: "Mike Johnson - +1234567893",
-          medicalHistory: "Diabetes Type 2",
-          createdAt: "2024-01-16T14:20:00Z",
-          updatedAt: "2024-01-16T14:20:00Z",
-        },
-      ]
+        credentials: 'include',
+      })
 
-      setPatients(mockPatients)
+      if (!response.ok) {
+        throw new Error('Failed to fetch patients')
+      }
+
+      const data = await response.json()
+      // Transform API response to match frontend interface
+      const transformedPatients = data.map((patient: any) => ({
+        id: patient.ID.toString(),
+        name: patient.name,
+        email: patient.email,
+        phone: patient.phone,
+        dateOfBirth: patient.dateOfBirth,
+        gender: patient.gender,
+        address: patient.address,
+        emergencyContact: patient.emergencyContact,
+        medicalHistory: patient.medicalHistory,
+        createdAt: patient.CreatedAt,
+        updatedAt: patient.UpdatedAt,
+      }))
+      setPatients(transformedPatients)
     } catch (error) {
       toast.error("Failed to fetch patients")
     } finally {
@@ -61,15 +56,35 @@ const ReceptionistDashboard = () => {
 
   const handleCreatePatient = async (patientData: Omit<Patient, "id" | "createdAt" | "updatedAt">) => {
     try {
-      // Mock API call
-      const newPatient: Patient = {
-        ...patientData,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+      const response = await fetch('/api/patients', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(patientData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create patient')
       }
 
-      setPatients([...patients, newPatient])
+      const newPatient = await response.json()
+      // Transform API response to match frontend interface
+      const transformedPatient = {
+        id: newPatient.ID.toString(),
+        name: newPatient.name,
+        email: newPatient.email,
+        phone: newPatient.phone,
+        dateOfBirth: newPatient.dateOfBirth,
+        gender: newPatient.gender,
+        address: newPatient.address,
+        emergencyContact: newPatient.emergencyContact,
+        medicalHistory: newPatient.medicalHistory,
+        createdAt: newPatient.CreatedAt,
+        updatedAt: newPatient.UpdatedAt,
+      }
+      setPatients([...patients, transformedPatient])
       setShowForm(false)
       toast.success("Patient registered successfully!")
     } catch (error) {
@@ -81,13 +96,35 @@ const ReceptionistDashboard = () => {
     if (!editingPatient) return
 
     try {
-      const updatedPatient: Patient = {
-        ...editingPatient,
-        ...patientData,
-        updatedAt: new Date().toISOString(),
+      const response = await fetch(`/api/patients/${editingPatient.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(patientData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update patient')
       }
 
-      setPatients(patients.map((p) => (p.id === editingPatient.id ? updatedPatient : p)))
+      const updatedPatientResponse = await response.json()
+      // Transform API response to match frontend interface
+      const transformedPatient = {
+        id: updatedPatientResponse.ID.toString(),
+        name: updatedPatientResponse.name,
+        email: updatedPatientResponse.email,
+        phone: updatedPatientResponse.phone,
+        dateOfBirth: updatedPatientResponse.dateOfBirth,
+        gender: updatedPatientResponse.gender,
+        address: updatedPatientResponse.address,
+        emergencyContact: updatedPatientResponse.emergencyContact,
+        medicalHistory: updatedPatientResponse.medicalHistory,
+        createdAt: updatedPatientResponse.CreatedAt,
+        updatedAt: updatedPatientResponse.UpdatedAt,
+      }
+      setPatients(patients.map((p) => (p.id === editingPatient.id ? transformedPatient : p)))
       setEditingPatient(null)
       setShowForm(false)
       toast.success("Patient updated successfully!")
@@ -98,6 +135,18 @@ const ReceptionistDashboard = () => {
 
   const handleDeletePatient = async (patientId: string) => {
     try {
+      const response = await fetch(`/api/patients/${patientId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete patient')
+      }
+
       setPatients(patients.filter((p) => p.id !== patientId))
       toast.success("Patient deleted successfully!")
     } catch (error) {

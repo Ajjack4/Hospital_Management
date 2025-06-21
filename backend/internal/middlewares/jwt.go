@@ -35,3 +35,13 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+func RequireRole(role string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		claims := c.MustGet("claims").(jwt.MapClaims)
+		if claims["role"] != role {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+			return
+		}
+		c.Next()
+	}
+}
