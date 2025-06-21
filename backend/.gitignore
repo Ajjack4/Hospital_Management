@@ -1,0 +1,5 @@
+.env
+.mod
+.sum
+
+*.exe
