@@ -1,5 +1,6 @@
 .env
-.mod
-.sum
+
+go.sum
 
 *.exe
+tmp
