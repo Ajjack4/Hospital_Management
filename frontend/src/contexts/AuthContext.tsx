@@ -30,11 +30,11 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-
+  
 useEffect(() => {
   const fetchUser = async () => {
     try {
-      const res = await fetch("/api/auth/me", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/me`, {
         credentials: "include",
       })
       if (res.ok) {
@@ -55,7 +55,7 @@ useEffect(() => {
   const login = async (email: string, password: string) => {
     try {
       // Mock API call - replace with actual API endpoint
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

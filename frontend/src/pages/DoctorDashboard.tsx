@@ -19,7 +19,7 @@ const DoctorDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch('/api/patients', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/patients`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ const DoctorDashboard = () => {
     if (!editingPatient) return
 
     try {
-      const response = await fetch(`/api/patients/${editingPatient.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/patients/${editingPatient.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
