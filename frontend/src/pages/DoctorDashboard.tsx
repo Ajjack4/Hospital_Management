@@ -19,7 +19,7 @@ const DoctorDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/patients`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/patients/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
