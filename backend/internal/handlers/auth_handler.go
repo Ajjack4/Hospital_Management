@@ -49,7 +49,15 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	// Set as HttpOnly cookie
-	c.SetCookie("auth_token", signed, 86400, "/", "", true, true) // HttpOnly = true for production
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "auth_token",
+		Value:    signed,
+		MaxAge:   86400,
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
 	c.JSON(http.StatusOK, gin.H{
 		"user": gin.H{
 			"id":    user.ID,
