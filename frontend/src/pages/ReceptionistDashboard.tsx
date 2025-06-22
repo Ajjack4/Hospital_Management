@@ -19,7 +19,7 @@ const ReceptionistDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/patients`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/patients/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const ReceptionistDashboard = () => {
 
   const handleCreatePatient = async (patientData: Omit<Patient, "id" | "createdAt" | "updatedAt">) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/patients`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/patients/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
